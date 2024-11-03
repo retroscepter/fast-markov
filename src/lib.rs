@@ -3,10 +3,14 @@
 use napi_derive::napi;
 use rand::Rng;
 use std::collections::HashMap;
+use std::sync::Arc;
+
+type WordMap = HashMap<Arc<str>, Vec<Arc<str>>>;
 
 #[napi(js_name = "MarkovChain")]
 pub struct MarkovChain {
-  chain: HashMap<String, Vec<String>>,
+  chain: WordMap,
+  word_count: usize,
 }
 
 #[napi]
@@ -14,65 +18,81 @@ impl MarkovChain {
   #[napi(constructor)]
   pub fn new() -> Self {
     MarkovChain {
-      chain: HashMap::new(),
+      chain: HashMap::with_capacity(1000),
+      word_count: 0,
     }
   }
 
   #[napi]
   pub fn add_text(&mut self, text: String) {
-    let words: Vec<String> = text.split_whitespace().map(|s| s.to_string()).collect();
+    if text.is_empty() {
+      return;
+    }
 
-    for i in 0..words.len().saturating_sub(1) {
-      let current = &words[i];
-      let next = &words[i + 1];
+    let words: Vec<Arc<str>> = text.split_whitespace().map(|s| Arc::from(s)).collect();
 
+    if words.len() < 2 {
+      return;
+    }
+
+    self.word_count += words.len();
+
+    let avg_transitions = 5;
+
+    for window in words.windows(2) {
       self
         .chain
-        .entry(current.clone())
-        .or_insert_with(Vec::new)
-        .push(next.clone());
+        .entry(Arc::clone(&window[0]))
+        .or_insert_with(|| Vec::with_capacity(avg_transitions))
+        .push(Arc::clone(&window[1]));
     }
   }
 
   #[napi]
   pub fn generate(&self, start_word: Option<String>, length: i32) -> String {
-    if self.chain.is_empty() {
+    if self.chain.is_empty() || length <= 0 {
       return String::new();
     }
 
     let mut rng = rand::thread_rng();
-    let mut result = Vec::new();
-    let mut current = start_word
-      .and_then(|word| {
+    let mut result = Vec::with_capacity(length as usize);
+
+    let first_word = match start_word {
+      Some(word) => {
+        let word = Arc::from(word.as_str());
         if self.chain.contains_key(&word) {
-          Some(word)
+          word
         } else {
-          self.chain.keys().next().map(|s| s.to_string())
+          Arc::clone(self.chain.keys().next().unwrap())
         }
-      })
-      .unwrap_or_else(|| {
-        self
-          .chain
-          .keys()
-          .nth(rng.gen_range(0..self.chain.len()))
-          .unwrap()
-          .clone()
-      });
+      }
+      None => {
+        let idx = rng.gen_range(0..self.chain.len());
+        Arc::clone(self.chain.keys().nth(idx).unwrap())
+      }
+    };
 
-    result.push(current.clone());
+    result.push(first_word.to_string());
+    let mut current = first_word;
 
-    for _ in 0..length.saturating_sub(1) {
-      if let Some(next_words) = self.chain.get(&current) {
-        if next_words.is_empty() {
-          break;
+    let target_len = length.min(100) as usize;
+
+    while result.len() < target_len {
+      match self.chain.get(&current) {
+        Some(next_words) if !next_words.is_empty() => {
+          let next = Arc::clone(&next_words[rng.gen_range(0..next_words.len())]);
+          result.push(next.to_string());
+          current = next;
         }
-        current = next_words[rng.gen_range(0..next_words.len())].clone();
-        result.push(current.clone());
-      } else {
-        break;
+        _ => break,
       }
     }
 
     result.join(" ")
+  }
+
+  #[napi]
+  pub fn get_word_count(&self) -> u32 {
+    self.word_count as u32
   }
 }

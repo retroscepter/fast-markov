@@ -7,4 +7,5 @@ export declare class MarkovChain {
   constructor()
   addText(text: string): void
   generate(startWord: string | undefined | null, length: number): string
+  getWordCount(): number
 }
