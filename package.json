@@ -6,7 +6,7 @@
   "napi": {
     "name": "fast-markov",
     "package": {
-      "name": "@fast-markov/native"
+      "name": "@fast-markov/core"
     },
     "triples": {
       "additional": [

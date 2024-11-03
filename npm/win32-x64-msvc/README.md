@@ -1,3 +1,3 @@
-# `fast-markov-win32-x64-msvc`
+# `@fast-markov/core-win32-x64-msvc`
 
 This is the **x86_64-pc-windows-msvc** binary for `fast-markov`

@@ -1,5 +1,5 @@
 {
-  "name": "@fast-markov/win32-arm64-msvc",
+  "name": "@fast-markov/core-win32-arm64-msvc",
   "version": "0.0.6",
   "os": [
     "win32"

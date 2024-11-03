@@ -1,3 +1,3 @@
-# `fast-markov-darwin-x64`
+# `@fast-markov/core-darwin-x64`
 
 This is the **x86_64-apple-darwin** binary for `fast-markov`

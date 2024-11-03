@@ -1,5 +1,5 @@
 {
-  "name": "@fast-markov/linux-x64-gnu",
+  "name": "@fast-markov/core-linux-x64-gnu",
   "version": "0.0.6",
   "os": [
     "linux"

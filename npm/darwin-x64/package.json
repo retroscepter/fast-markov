@@ -1,5 +1,5 @@
 {
-  "name": "@fast-markov/darwin-x64",
+  "name": "@fast-markov/core-darwin-x64",
   "version": "0.0.6",
   "os": [
     "darwin"
