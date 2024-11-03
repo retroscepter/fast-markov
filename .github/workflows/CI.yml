@@ -136,6 +136,11 @@ jobs:
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8.10.5
+          run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -167,6 +172,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8.10.5
+          run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -197,6 +207,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8.10.5
+          run_install: false
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
