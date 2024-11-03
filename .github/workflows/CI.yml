@@ -56,13 +56,13 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8.10.5
+          version: 9
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
       - name: Install
         uses: dtolnay/rust-toolchain@stable
@@ -98,7 +98,7 @@ jobs:
         uses: actions/setup-node@v4
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
           architecture: x86
       - name: Build in docker
@@ -138,7 +138,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8.10.5
+          version: 9
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
@@ -173,7 +173,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8.10.5
+          version: 9
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
@@ -207,7 +207,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8.10.5
+          version: 9
           run_install: false
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -248,12 +248,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8.10.5
+          version: 9
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
