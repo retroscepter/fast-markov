@@ -96,3 +96,13 @@ test("importCorpus() handles invalid JSON gracefully", (t) => {
   t.is(markov.getWordCount(), 2);
   t.is(markov.generate("hello", 2), "hello world");
 });
+
+test("MarkovChain constructor accepts options with initialCapacity", (t) => {
+  const markov = new MarkovChain({ initialCapacity: 5000 });
+  t.truthy(markov);
+});
+
+test("MarkovChain constructor works without options", (t) => {
+  const markov = new MarkovChain();
+  t.truthy(markov);
+});

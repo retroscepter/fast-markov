@@ -13,12 +13,21 @@ pub struct MarkovChain {
   word_count: usize,
 }
 
+#[napi(object)]
+pub struct MarkovChainOptions {
+  pub initial_capacity: Option<u32>,
+}
+
 #[napi]
 impl MarkovChain {
   #[napi(constructor)]
-  pub fn new() -> Self {
+  pub fn new(options: Option<MarkovChainOptions>) -> Self {
+    let capacity = options
+      .and_then(|opts| opts.initial_capacity)
+      .unwrap_or(1000) as usize;
+
     MarkovChain {
-      chain: HashMap::with_capacity(1000),
+      chain: HashMap::with_capacity(capacity),
       word_count: 0,
     }
   }
