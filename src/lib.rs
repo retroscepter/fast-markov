@@ -58,42 +58,69 @@ impl MarkovChain {
   }
 
   #[napi]
-  pub fn generate(&self, start_word: Option<String>, length: i32) -> String {
-    if self.chain.is_empty() || length <= 0 {
+  pub fn generate(&self, start_word: Option<String>, length: u32) -> String {
+    if self.chain.is_empty() || length == 0 {
       return String::new();
     }
 
     let mut rng = rand::thread_rng();
     let mut result = Vec::with_capacity(length as usize);
 
+    // Get start word - either provided or random from words that have transitions
     let first_word = match start_word {
       Some(word) => {
-        let word = Arc::from(word.as_str());
-        if self.chain.contains_key(&word) {
-          word
+        if self.chain.contains_key(&word as &str) {
+          Arc::from(word)
         } else {
-          Arc::clone(self.chain.keys().next().unwrap())
+          // Only select from words that have transitions
+          let valid_keys: Vec<_> = self
+            .chain
+            .keys()
+            .filter(|k| !self.chain[*k].is_empty())
+            .collect();
+          if valid_keys.is_empty() {
+            return String::new(); // No valid transitions available
+          }
+          Arc::clone(valid_keys[rng.gen_range(0..valid_keys.len())])
         }
       }
       None => {
-        let idx = rng.gen_range(0..self.chain.len());
-        Arc::clone(self.chain.keys().nth(idx).unwrap())
+        let valid_keys: Vec<_> = self
+          .chain
+          .keys()
+          .filter(|k| !self.chain[*k].is_empty())
+          .collect();
+        if valid_keys.is_empty() {
+          return String::new(); // No valid transitions available
+        }
+        Arc::clone(valid_keys[rng.gen_range(0..valid_keys.len())])
       }
     };
 
     result.push(first_word.to_string());
-    let mut current = first_word;
+    let mut current_word = first_word;
 
-    let target_len = length.min(100) as usize;
-
-    while result.len() < target_len {
-      match self.chain.get(&current) {
+    // Generate subsequent words
+    while result.len() < length as usize {
+      match self.chain.get(&current_word as &str) {
         Some(next_words) if !next_words.is_empty() => {
-          let next = Arc::clone(&next_words[rng.gen_range(0..next_words.len())]);
-          result.push(next.to_string());
-          current = next;
+          let next_word = Arc::clone(&next_words[rng.gen_range(0..next_words.len())]);
+          result.push(next_word.to_string());
+          current_word = next_word;
         }
-        _ => break,
+        _ => {
+          // If we hit a dead end, pick a random word that has transitions
+          let valid_keys: Vec<_> = self
+            .chain
+            .keys()
+            .filter(|k| !self.chain[*k].is_empty())
+            .collect();
+          if valid_keys.is_empty() {
+            break; // No more valid transitions possible
+          }
+          current_word = Arc::clone(valid_keys[rng.gen_range(0..valid_keys.len())]);
+          result.push(current_word.to_string());
+        }
       }
     }
 
