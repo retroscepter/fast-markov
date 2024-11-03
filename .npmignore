@@ -11,3 +11,4 @@ pnpm-lock.yaml
 .pnpm
 __test__
 renovate.json
+bench
