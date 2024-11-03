@@ -8,4 +8,6 @@ export declare class MarkovChain {
   addText(text: string): void
   generate(startWord: string | undefined | null, length: number): string
   getWordCount(): number
+  exportCorpus(): string
+  importCorpus(json: string): void
 }

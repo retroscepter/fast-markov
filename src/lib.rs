@@ -95,4 +95,40 @@ impl MarkovChain {
   pub fn get_word_count(&self) -> u32 {
     self.word_count as u32
   }
+
+  #[napi]
+  pub fn export_corpus(&self) -> String {
+    let mut entries: Vec<(String, Vec<String>)> = self
+      .chain
+      .iter()
+      .map(|(k, v)| (k.to_string(), v.iter().map(|s| s.to_string()).collect()))
+      .collect();
+
+    // Sort for consistent output
+    entries.sort_by(|a, b| a.0.cmp(&b.0));
+
+    serde_json::to_string(&entries).unwrap_or_default()
+  }
+
+  #[napi]
+  pub fn import_corpus(&mut self, json: String) {
+    if let Ok(entries) = serde_json::from_str::<Vec<(String, Vec<String>)>>(&json) {
+      self.chain.clear();
+
+      // Count unique words across all entries
+      let mut unique_words = std::collections::HashSet::new();
+
+      for (key, values) in entries {
+        unique_words.insert(key.clone());
+        unique_words.extend(values.iter().cloned());
+
+        let key = Arc::from(key.as_str());
+        let values: Vec<Arc<str>> = values.iter().map(|s| Arc::from(s.as_str())).collect();
+
+        self.chain.insert(key, values);
+      }
+
+      self.word_count = unique_words.len();
+    }
+  }
 }
