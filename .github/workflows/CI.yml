@@ -174,8 +174,6 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-      - name: Build package
-        run: pnpm build
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -183,6 +181,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
+      - name: Build package
+        run: pnpm build
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -209,8 +209,6 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-      - name: Build package
-        run: pnpm build
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -224,6 +222,8 @@ jobs:
           pnpm config set supportedArchitectures.cpu "arm64"
           pnpm config set supportedArchitectures.libc "glibc"
           pnpm install
+      - name: Build package
+        run: pnpm build
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
