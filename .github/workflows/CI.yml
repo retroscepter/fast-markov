@@ -174,6 +174,8 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
+      - name: Build package
+        run: pnpm build
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -190,7 +192,7 @@ jobs:
         run: ls -R .
         shell: bash
       - name: Test bindings
-        run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim "npm run build && npm run test"
+        run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim npm run test
   test-linux-aarch64-gnu-binding:
     name: Test bindings on aarch64-unknown-linux-gnu - node@${{ matrix.node }}
     needs:
@@ -207,6 +209,8 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
+      - name: Build package
+        run: pnpm build
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -232,7 +236,6 @@ jobs:
           options: "--platform linux/arm64 -v ${{ github.workspace }}:/build -w /build"
           run: |
             set -e
-            npm run build
             npm run test
             ls -la
   publish:
