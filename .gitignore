@@ -199,3 +199,6 @@ Cargo.lock
 
 .pnpm-debug.log*
 .pnpm-store/
+
+index.js
+index.d.ts

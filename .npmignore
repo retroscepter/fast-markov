@@ -1,5 +1,6 @@
 target
 Cargo.lock
+Cargo.toml
 .cargo
 .github
 npm
@@ -12,3 +13,5 @@ pnpm-lock.yaml
 __test__
 renovate.json
 bench
+build.rs
+.vscode
